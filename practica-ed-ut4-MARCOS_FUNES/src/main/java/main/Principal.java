@@ -1,81 +1,55 @@
 package main;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Arrays;
+import entity.Tienda;
+import service.MostrarValores;
+import service.Service;
+import service.TiendaBuilder;
 
+/**
+ * Clase principal del proyecto.
+ * @version 1.0
+ * @author Marcos Funes Arribas
+ * @since 03/06/2021
+ */
 public class Principal {
-
+/**
+ * Metodo principal encargado de comenzar el proyecto.
+ * @param args es un arreglo con los parámetros que el reciba por consola.
+ */
     public static void main(String[] args) {
-        int idMaxMargen = 0, idMinMargen = 0;
-        double maxMargen = 0, minMargen = 0, beneficio = 0;
-        // vector con los rendimientos generadas
-        Double[] arrayPrecios = new Double[20];
-        Double[] arrayCoste = new Double[20];
-        Double[] arrayMargenes = new Double[20];
-        Double[] arrayNuevoPrecio = new Double[20];
-
-        // Genera precio random entre 0 y 2000
-        for (int i = 0; i < arrayPrecios.length; i++) {
-            arrayPrecios[i] = BigDecimal.valueOf(Math.random() * 2000).setScale(2, RoundingMode.HALF_UP).doubleValue();
-        }
-
-        // Genera coste random entre 0 y 1000
-        for (int i = 0; i < arrayPrecios.length; i++) {
-            arrayCoste[i] = BigDecimal.valueOf(Math.random() * 1000).setScale(2, RoundingMode.HALF_UP).doubleValue();
-        }
-
-        // Operaciones
-        // 1. Calcula Margen de beneficio
-        for (int i = 0; i < arrayPrecios.length; i++) {
-            arrayMargenes[i] = BigDecimal.valueOf(((arrayPrecios[i] - arrayCoste[i]) / arrayPrecios[i]) * 100)
-                    .setScale(2, RoundingMode.HALF_UP).doubleValue();
-        }
-
-        // 2. Obtener el id del producto con mayor margen de beneficio
-        double postEval = Double.MIN_VALUE;
-        for (int i = 0; i < arrayMargenes.length; i++) {
-            double preEval = arrayMargenes[i];
-            if (preEval > postEval) {
-                maxMargen = preEval;
-                postEval = arrayMargenes[i];
-                idMaxMargen = i + 1;
-            }
-        }
-        // 3. Obtener el id del producto con menor margen de beneficio
-        postEval = Double.MAX_VALUE;
-        for (int i = 0; i < arrayMargenes.length; i++) {
-            double preEval = arrayMargenes[i];
-            if (preEval < postEval) {
-                minMargen = preEval;
-                postEval = arrayMargenes[i];
-                idMinMargen = i + 1;
-            }
-        }
-        // 4. Calcular el precio del producto para todos aquellos productos que no
-        // tengan al menos un margen del 10%
-        for (int i = 0; i < arrayMargenes.length; i++) {
-            if (arrayMargenes[i] < 10) {
-                arrayNuevoPrecio[i] = BigDecimal.valueOf((arrayCoste[i] / (1 - (10.00 / 100))))
-                        .setScale(2, RoundingMode.HALF_UP).doubleValue();
-            }
-        }
-
-        // 5. Beneficio total
-        for (int i = 0; i < arrayCoste.length; i++) {
-            beneficio = BigDecimal.valueOf(beneficio + (arrayPrecios[i] - arrayCoste[i])).setScale(2, RoundingMode.HALF_UP)
-                    .doubleValue();
-        }
-
-        System.out.println("Array Precio: " + Arrays.toString(arrayPrecios));
-        System.out.println("Array Coste: " + Arrays.toString(arrayCoste));
-        System.out.println("Array Margen: " + Arrays.toString(arrayMargenes));
-        System.out.println("Array Nuevo: " + Arrays.toString(arrayNuevoPrecio));
-        System.out.println("Margen Maximo: " + maxMargen);
-        System.out.println("Margen Minimo: " + minMargen);
-        System.out.println("Id producto margen maximo: " + idMaxMargen);
-        System.out.println("Id producto margen minimo: " + idMinMargen);
-        System.out.println("Beneficio total: " + beneficio);
+    TiendaBuilder builder=new TiendaBuilder();
+    Tienda tienda = builder.construirTienda();
+    Service principal=new Service();
+    
+            // Operaciones
+    
+            // 1. Calcula Margen de beneficio
+            principal.calculaMargenBenef(tienda);
+            
+            // 2. Obtener el id del producto con mayor margen de beneficio
+            tienda.setIdMaxMargen(principal.calcularIdMaximo(tienda));
+            
+            // 3. Obtener el id del producto con menor margen de beneficio
+            tienda.setIdMinMargen(principal.calcularIdMin(tienda));
+            
+            // 4. Calcular el precio del producto para todos aquellos productos 
+            // que no tengan al menos un margen del 10%
+            principal.calcularNuevoPrecioProduct(tienda);
+    		
+            // 5. Beneficio total
+            principal.benefTotal(tienda); 
+    		
+            MostrarValores menu=new MostrarValores();
+            
+            menu.mostrarPrecios(tienda);
+            menu.mostrarCostes(tienda);
+            menu.mostrarMargen(tienda);
+            menu.mostrarNuevoPrecio(tienda);
+            
+            System.out.println("Id producto margen maximo: " + tienda.getIdMaxMargen());
+            System.out.println("Id producto margen minimo: " + tienda.getIdMinMargen());
+            System.out.println("Margen Maximo: " + tienda.getMaxMargen());
+            System.out.println("Margen Minimo: " + tienda.getMinMargen());
+            System.out.println("Beneficio total: " + tienda.getBeneficioTotal());
+    	} 
     }
-
-}
